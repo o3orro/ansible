@@ -1,0 +1,21 @@
+---
+# Task
+- name: Install the package - {{ pkgs }}
+  ansible.builtin.dnf:
+    name: "{{ pkgs }}"
+    state: present
+
+- name: Start the services - {{ svcs }}
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+  loop: "{{ svcs }}"
+
+- name: Open the firewall service - {{ opens }}
+  ansible.builtin.firewalld:
+    service: "{{ item }}"
+    permanent: true
+    immediate: true
+    state: enabled
+  loop: "{{ opens }}"

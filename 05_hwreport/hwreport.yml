@@ -1,0 +1,61 @@
+---
+- name: 0) 하드웨어 보고서 작성
+  hosts: all
+  gather_facts: true
+  vars:
+    file_src: files/hwreport.txt
+    file_dest: /root/hwreport.txt
+    dir_restult: results
+    
+  tasks:
+    #####################################
+    # 1) 파일 배포 - copy
+    #   * files/hwreport.txt -- copy --> /root/hwreport.txt (root:root 0600)   
+    # 2) 파일 작성 - replace, lineinfile
+    #   * INVENTORY_HOSTNAME = inventoryhostname
+    #   * TOTAL_MEM = totalmem
+    #   * BIOS_VER = biosversion
+    #   * SDA_SIZE = sdasize
+    # 3) 파일 수집 - fetch
+    #   * flat: true
+    #   * flat: false
+    #####################################
+
+    - name: 1) 파일 배포
+      ansible.builtin.copy:
+        src: "{{ file_src }}"
+        dest: "{{ file_dest }}"
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: 2) 파일 작성 - inventory_hostname {{ inventory_hostname }}
+      ansible.builtin.replace:
+        path: "{{ file_dest }}"
+        regexp: 'inventoryhostname'
+        replace: "{{ inventory_hostname }}"
+
+    - name: 2) 파일 작성 - ansible_memtotal_mb {{ ansible_memtotal_mb }}
+      ansible.builtin.replace:
+        path: "{{ file_dest }}"
+        regexp: 'totalmem'
+        replace: "{{ ansible_memtotal_mb }}"
+    
+    - name: 2) 파일 작성 - ansible_bios_version {{ ansible_bios_version }} 
+      ansible.builtin.lineinfile:
+        path: "{{ file_dest }}"
+        regexp: 'biosversion'
+        line: "BIOS_VER = {{ ansible_bios_version }}"
+
+    - name: 2) 파일 작성 - ansible_devices.sda.size {{ ansible_devices.sda.size }}
+      ansible.builtin.lineinfile:
+        path: "{{ file_dest }}"
+        regexp: 'sdasize'
+        line: "SDA_SIZE = {{ ansible_devices.sda.size }}"
+
+    - name: 3) 파일 수집
+      ansible.builtin.fetch:
+        src: "{{ file_dest }}"
+        dest: "{{ dir_results }}/{{inventory_hostname}}-hwreport.txt"
+        flat: true
+    

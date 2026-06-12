@@ -1,0 +1,2 @@
+- name: myrole
+  src: andrewrothstein.haproxy

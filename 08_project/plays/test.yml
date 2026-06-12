@@ -1,0 +1,14 @@
+---
+# Play
+- name: Web Request
+  hosts: localhost
+  become: false
+  gather_facts: false
+  tasks:
+    - name: Web Request - {{ urls }} 
+      ansible.builtin.uri:
+        url: "{{ item }}"
+        return_content: true
+        status_code: 200
+        validate_certs: false
+      loop: "{{ urls }}"

@@ -1,0 +1,23 @@
+---
+#################################
+# include_tasks: tasks/restore_tasks.yml
+##################################
+- name: Restore playbook.yml
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Rollback the service
+      ansible.builtin.include_tasks:
+        file: tasks/restore_tasks.yml
+      vars:
+        fw_svcs:
+          - http
+          - https
+        svcs:
+          - httpd
+          - firewalld
+        files:
+          - /var/www/html/index.html
+        pkgs:
+          - httpd
+          - mod_ssl

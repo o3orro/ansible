@@ -1,0 +1,13 @@
+---
+- name: 0) 파일 배포
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: 파일 배포 - /etc/hosts
+      ansible.builtin.template:
+      # templates/hosts.j2 -- template --> /etc/hosts
+        src: templates/hosts.j2
+        dest: /etc/hosts
+        owner: root
+        group: root
+        mode: '0644'

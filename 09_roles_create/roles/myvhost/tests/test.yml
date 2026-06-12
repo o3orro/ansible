@@ -1,0 +1,9 @@
+---
+- name: Virtual Hosting
+  hosts: localhost
+  gather_facts: true
+  tasks:
+    - name: Virtual Hosting - /var/www/{{ inventory_hostname }}/
+      ansible.builtin.include_role:
+        name: myvhost
+        

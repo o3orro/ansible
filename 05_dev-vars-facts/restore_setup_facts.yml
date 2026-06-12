@@ -1,0 +1,13 @@
+---
+- name: Restore setup_facts.yml
+  hosts: all
+  gather_facts: false
+  vars:
+    facts_dir: /etc/ansible/facts.d
+    facts_file: custom.fact
+  tasks:
+
+    - name: 1) 디렉토리 삭제 - {{facts_dir}}
+      ansible.builtin.file:
+        path: "{{facts_dir}}"
+        state: absent

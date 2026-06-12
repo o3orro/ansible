@@ -1,0 +1,60 @@
+---
+- name: DB 설치
+  hosts: databases
+  gather_facts: false
+  remote_user: root
+  tasks:
+    ######################################
+    # 1) DB 패키지 설치 - mariadb, mariadb-server, python3-PyMySQL
+    # 2) DB 기동
+    #    - [참고] DB 기동 => root 암호 설정
+    # 3) DB 주 설정 수정
+    #    - /var/www/html/my.cnf.standard -- copy --> /etc/my.cnf
+    #    - [참고] DB 재기동
+    ######################################
+
+    # 1) DB 패키지 설치 - mariadb, mariadb-server, python3-PyMySQL
+    - name: 1) DB 패키지 설치 - mariadb, mariadb-server, python3-PyMySQL
+      ansible.builtin.dnf:
+        name:
+          - mariadb
+          - mariadb-server
+          - python3-PyMySQL
+        state: latest
+
+    # 2) DB 기동 - mariadb
+    #    - [참고] DB 기동 => root 암호 설정
+    - name: 2) DB 기동 - mariadb
+      ansible.builtin.systemd:
+        name: mariadb
+        state: started
+        enabled: true
+      notify:
+        - set db password
+
+    # 3) DB 주 설정 수정
+    #    - /var/www/html/my.cnf.standard -- copy --> /etc/my.cnf
+    #    - [참고] DB 재기동
+    - name: 3) DB 주 설정 수정 - /etc/my.cnf
+      ansible.builtin.get_url:
+        url: 'http://192.168.10.10/my.cnf.standard'
+        dest: /etc/my.cnf
+        mode: '0644'
+      notify:
+        - restart db
+  handlers:
+    - name: set db password  
+      community.mysql.mysql_user:
+        name: root
+        password: 'soldesk1.'
+        priv: '*.*:ALL'
+        state: present
+        login_user: root
+        login_password: 'soldesk1.'
+        login_unix_socket: /var/lib/mysql/mysql.sock
+
+    - name: restart db
+      ansible.builtin.systemd:
+        name: mariadb
+        state: restarted
+

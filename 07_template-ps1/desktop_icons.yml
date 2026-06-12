@@ -1,0 +1,31 @@
+---
+- name: Copy desktop icons
+  hosts: all
+  become: true
+
+  tasks:
+    - name: devops 바탕화면 디렉터리 생성
+      ansible.builtin.file:
+        path: /home/devops/바탕화면
+        state: directory
+        owner: devops
+        group: devops
+        mode: '0755'
+
+    - name: Terminal 아이콘 복사
+      ansible.builtin.copy:
+        src: /usr/share/applications/org.gnome.Terminal.desktop
+        dest: /home/devops/바탕화면/org.gnome.Terminal.desktop
+        owner: devops
+        group: devops
+        mode: '0755'
+        remote_src: true
+
+    - name: gedit 아이콘 복사
+      ansible.builtin.copy:
+        src: /usr/share/applications/org.gnome.gedit.desktop
+        dest: /home/devops/바탕화면/org.gnome.gedit.desktop
+        owner: devops
+        group: devops
+        mode: '0755'
+        remote_src: true

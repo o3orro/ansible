@@ -1,0 +1,32 @@
+---
+- name: 사용자 추가/권한/인증
+  hosts: all
+  remote_user: ansible
+  gather_facts: false
+  vars:
+    username: devops
+    pwhash: soldesk1.
+  tasks:
+    #####################################
+    # 1) 사용자 추가 - devops
+    # 2) 사용자 권한 설정 - sudo(/etc/sudoers.d/devops)
+    # 3) 공개키 인증(ssh-keygen + ssh-copy-id)
+    #####################################
+    - name: 1) 사용자 추가 - devops
+      ansible.builtin.user:
+        name: "{{username}}"
+        password: "{{pwhash | password_hash('sha512')}}"
+
+    - name: 2) 사용자 권한 설정 - sudo(/etc/sudoers.d/devops)
+      ansible.builtin.copy:
+        src: files/devops
+        dest: /etc/sudoers.d/devops
+        owner: root
+        group: root
+        mode: '0400'
+
+    - name: 3) 공개키 인증(ssh-keygen + ssh-copy-id)
+      ansible.posix.authorized_key:
+        user: devops
+        state: present
+        key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
