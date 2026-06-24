@@ -1,0 +1,50 @@
+---
+- name: Gather facts from all hosts
+  hosts: all
+  gather_facts: true
+  tasks: []
+
+- name: Configure DNS server
+  hosts: dns_server
+  become: true
+  gather_facts: false
+  roles:
+    - role: dns
+      vars:
+        dns_domain: example.com
+        dns_server_hostname: "{{ hostvars.ansible.ansible_hostname }}"
+
+        reverse_zone: 10.168.192.in-addr.arpa
+        reverse_zone_file: 10.168.192.rev
+
+        dns_zone_serial: 20260623
+
+        dns_records:
+          - name: ansible
+            ip: "{{ hostvars.ansible.ansible_default_ipv4.address }}"
+          - name: ansible1
+            ip: "{{ hostvars.ansible1.ansible_default_ipv4.address }}"
+          - name: ansible2
+            ip: "{{ hostvars.ansible2.ansible_default_ipv4.address }}"
+
+
+- name: Configure DNS clients
+  hosts: dns_clients
+  become: true
+  gather_facts: false
+  vars:
+    dns_server_ip: "{{ hostvars.ansible.ansible_default_ipv4.address }}"
+    conn_name: eth0
+
+  tasks:
+    - name: Set DNS server
+      ansible.builtin.command:
+        cmd: "nmcli con mod {{ conn_name }} ipv4.dns {{ dns_server_ip }}"
+
+    - name: Ignore DHCP DNS
+      ansible.builtin.command:
+        cmd: "nmcli con mod {{ conn_name }} ipv4.ignore-auto-dns yes"
+
+    - name: Reactivate connection
+      ansible.builtin.command:
+        cmd: "nmcli con up {{ conn_name }}"

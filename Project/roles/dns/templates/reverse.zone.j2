@@ -1,0 +1,13 @@
+$TTL 1D
+@       IN SOA  {{ dns_server_hostname }}.{{ dns_domain }}. root.{{ dns_domain }}. (
+                {{ dns_zone_serial }} ; serial
+                1D                   ; refresh
+                1H                   ; retry
+                1W                   ; expire
+                3H )                 ; minimum
+
+        IN NS   {{ dns_server_hostname }}.{{ dns_domain }}.
+
+{% for record in dns_records %}
+{{ record.ip.split('.')[-1] }}    IN PTR    {{ record.name }}.{{ dns_domain }}.
+{% endfor %}

@@ -1,0 +1,12 @@
+---
+- name: Set DNS server
+  ansible.builtin.command:
+    cmd: "nmcli con mod {{ conn_name }} ipv4.dns {{ dns_server_ip }}"
+
+- name: Ignore DHCP DNS
+  ansible.builtin.command:
+    cmd: "nmcli con mod {{ conn_name }} ipv4.ignore-auto-dns yes"
+
+- name: Reactivate connection
+  ansible.builtin.command:
+    cmd: "nmcli con up {{ conn_name }}"

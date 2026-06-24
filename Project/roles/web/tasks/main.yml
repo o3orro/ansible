@@ -1,0 +1,20 @@
+---
+- name: Install web packages
+  ansible.builtin.dnf:
+    name:
+      - httpd
+    state: present
+
+- name: Create web index file
+  ansible.builtin.copy:
+    content: "WEB TEST {{ ansible_hostname }}\n"
+    dest: /var/www/html/index.html
+    owner: root
+    group: root
+    mode: '0644'
+    
+- name: Start httpd service
+  ansible.builtin.service:
+    name: httpd
+    state: started
+    enabled: true

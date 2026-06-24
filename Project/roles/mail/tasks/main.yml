@@ -1,0 +1,25 @@
+---
+- name: Install mail packages
+  ansible.builtin.dnf:
+    name:
+      - postfix
+      - s-nail
+    state: present
+
+- name: Set postfix myhostname
+  ansible.builtin.command:
+    cmd: "postconf -e 'myhostname = mail.{{ ansible_hostname }}.{{ mail_domain }}'"
+
+- name: Listen on all interfaces
+  ansible.builtin.command:
+    cmd: "postconf -e 'inet_interfaces = all'"
+
+- name: Use ipv4 only
+  ansible.builtin.command:
+    cmd: "postconf -e 'inet_protocols = ipv4'"
+
+- name: Restart postfix
+  ansible.builtin.service:
+    name: postfix
+    state: restarted
+    enabled: true

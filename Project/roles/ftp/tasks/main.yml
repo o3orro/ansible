@@ -1,0 +1,24 @@
+---
+- name: Install FTP packages
+  ansible.builtin.dnf:
+    name:
+      - vsftpd
+    state: present
+
+- name: Enable anonymous FTP access
+  ansible.builtin.lineinfile:
+    path: /etc/vsftpd/vsftpd.conf
+    regexp: '^anonymous_enable='
+    line: 'anonymous_enable=YES'   
+
+- name: Disable vsftpd user list check
+  ansible.builtin.lineinfile:
+    path: /etc/vsftpd/vsftpd.conf
+    regexp: '^userlist_enable='
+    line: 'userlist_enable=NO'    
+
+- name: Start vsftpd service
+  ansible.builtin.service:
+    name: vsftpd
+    state: restarted
+    enabled: true

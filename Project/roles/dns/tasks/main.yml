@@ -1,0 +1,45 @@
+---
+- name: Install DNS packages
+  ansible.builtin.dnf:
+    name:
+      - bind
+      - bind-utils
+    state: present
+
+- name: Configure named.conf
+  ansible.builtin.template:
+    src: named.conf.j2
+    dest: /etc/named.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart named
+
+- name: Configure reverse zone file
+  ansible.builtin.template:
+    src: reverse.zone.j2
+    dest: "/var/named/{{ reverse_zone_file }}"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart named   
+
+- name: Configure forward zone file
+  ansible.builtin.template:
+    src: forward.zone.j2
+    dest: "/var/named/{{ dns_domain }}.zone"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart named
+
+- name: Check forward zone
+  ansible.builtin.command:
+    cmd: "named-checkzone {{ dns_domain }} /var/named/{{ dns_domain }}.zone"
+  changed_when: false
+
+- name: Start named service
+  ansible.builtin.service:
+    name: named
+    state: started
+    enabled: true

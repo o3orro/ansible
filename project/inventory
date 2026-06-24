@@ -1,0 +1,6 @@
+[dns_server]
+ansible
+
+[dns_clients]
+ansible1
+ansible2
