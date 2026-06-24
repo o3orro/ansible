@@ -1,5 +1,5 @@
 ---
-- name: Install mail packages
+- name: Install mail
   ansible.builtin.dnf:
     name:
       - postfix

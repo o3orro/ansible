@@ -52,7 +52,7 @@
         conn_name: eth0
 
 
-- name: Configure Mail
+- name: Configure Mail Servers
   hosts: mail
   become: true
   gather_facts: true
