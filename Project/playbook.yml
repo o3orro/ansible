@@ -2,6 +2,7 @@
 - name: Gather facts from all hosts
   hosts: all
   gather_facts: true
+  tags: always
   tasks: []
 
 
@@ -9,6 +10,7 @@
   hosts: dns_server
   become: true
   gather_facts: false
+  tags: dns
   tasks:
     - name: Configure DNS Server Role
       ansible.builtin.include_role:
@@ -29,15 +31,20 @@
             ip: "{{ hostvars.ansible1.ansible_default_ipv4.address }}"
           - name: ansible2
             ip: "{{ hostvars.ansible2.ansible_default_ipv4.address }}"
+          - name: ansible3
+            ip: "{{ hostvars.ansible3.ansible_default_ipv4.address }}"            
+          - name: ansible4
+            ip: "{{ hostvars.ansible4.ansible_default_ipv4.address }}"
 
         mail_hostname: mail
-        mail_server_ip: "{{ hostvars.ansible.ansible_default_ipv4.address }}"            
+        mail_server_ip: "{{ hostvars.ansible.ansible_default_ipv4.address }}"
 
 
 - name: Configure DNS Clients
   hosts: dns_clients
   become: true
   gather_facts: false
+  tags: dns_client
   tasks:
     - name: Configure DNS Client Role
       ansible.builtin.include_role:
@@ -46,10 +53,12 @@
         dns_server_ip: "{{ hostvars.ansible.ansible_default_ipv4.address }}"
         conn_name: eth0
 
+
 - name: Configure Mail Servers
   hosts: mail_servers
   become: true
   gather_facts: true
+  tags: mail
   tasks:
     - name: Configure Mail Role
       ansible.builtin.include_role:
@@ -57,19 +66,23 @@
       vars:
         mail_domain: example.com
 
+
 - name: Configure WEB Servers
   hosts: web_servers
   become: true
   gather_facts: true
+  tags: web
   tasks:
     - name: Configure WEB Role
       ansible.builtin.include_role:
         name: web
 
+
 - name: Configure FTP Servers
   hosts: ftp_servers
   become: true
   gather_facts: false
+  tags: ftp
   tasks:
     - name: Configure FTP Role
       ansible.builtin.include_role:
