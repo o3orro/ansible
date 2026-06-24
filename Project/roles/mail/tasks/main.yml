@@ -10,6 +10,18 @@
   ansible.builtin.command:
     cmd: "postconf -e 'myhostname = mail.{{ ansible_hostname }}.{{ mail_domain }}'"
 
+- name: Set postfix mydomain
+  ansible.builtin.command:
+    cmd: "postconf -e 'mydomain = {{ ansible_hostname }}.{{ mail_domain }}'"
+
+- name: Set postfix myorigin
+  ansible.builtin.command:
+    cmd: "postconf -e 'myorigin = $myhostname'"
+
+- name: Set postfix mydestination
+  ansible.builtin.command:
+    cmd: "postconf -e 'mydestination = $myhostname, localhost.$mydomain, localhost, $mydomain'"
+
 - name: Listen on all interfaces
   ansible.builtin.command:
     cmd: "postconf -e 'inet_interfaces = all'"

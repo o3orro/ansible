@@ -36,8 +36,6 @@
           - name: ansible4
             ip: "{{ hostvars.ansible4.ansible_default_ipv4.address }}"
 
-        mail_hostname: mail
-        mail_server_ip: "{{ hostvars.ansible.ansible_default_ipv4.address }}"
 
 
 - name: Configure DNS Clients
@@ -54,8 +52,8 @@
         conn_name: eth0
 
 
-- name: Configure Mail Servers
-  hosts: mail_servers
+- name: Configure Mail
+  hosts: mail
   become: true
   gather_facts: true
   tags: mail
